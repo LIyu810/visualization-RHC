@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预跑结果可视化 - 版本对比</title>
+    <style>
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 3200px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+        }
+        .compare-pane {
+            flex: 1;
+        }
+        .compare-pane + .compare-pane {
+            border-left: 1px solid #eee;
+            padding-left: 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        h2 {
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 12px;
+            margin-top: 40px;
+            color: #34495e;
+            font-size: 1.5em;
+        }
+        .filter-section {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-section label {
+            font-weight: bold;
+            color: #555;
+        }
+        .filter-section select {
+            padding: 10px 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fefefe;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            white-space: nowrap;
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 14px 18px;
+            text-align: center;
+            font-size: 14px;
+        }
+        th {
+            background-color: #ecf0f1;
+            font-weight: bold;
+            color: #555;
+            text-transform: uppercase;
+        }
+        tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        #mainMetricsTable1 td, #mainMetricsTable2 td {
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        /* Styles for the heatmap cells */
+        .heatmap-cell {
+            transition: background-color 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="compare-pane left-pane">
+        <h1>版本一</h1>
+        <div class="filter-section">
+            <label for="taskSelector1">选择任务:</label>
+            <select id="taskSelector1"></select>
+        </div>
+        <hr>
+        <div id="mainMetricsSection1">
+            <h2>主指标</h2>
+            <table id="mainMetricsTable1"></table>
+        </div>
+        <hr>
+        <div id="platformConfigSection1">
+            <h2>平台主张配置</h2>
+            <p>参数ID: <span id="parameterIdDisplay1"></span></p>
+            <table id="platformConfigTable1"></table>
+        </div>
+        <hr>
+        <div id="currentBeatSection1">
+            <h2>现状Beat：ADR</h2>
+            <table id="currentBeatTable1"></table>
+        </div>
+        <hr>
+        <div id="strategyBeatSection1">
+            <h2>策略Beat：ADR</h2>
+            <table id="strategyBeatTable1"></table>
+        </div>
+    </div>
+
+    <div class="compare-pane right-pane">
+        <h1>版本二</h1>
+        <div class="filter-section">
+            <label for="taskSelector2">选择任务:</label>
+            <select id="taskSelector2"></select>
+        </div>
+        <hr>
+        <div id="mainMetricsSection2">
+            <h2>主指标</h2>
+            <table id="mainMetricsTable2"></table>
+        </div>
+        <hr>
+        <div id="platformConfigSection2">
+            <h2>平台主张配置</h2>
+            <p>参数ID: <span id="parameterIdDisplay2"></span></p>
+            <table id="platformConfigTable2"></table>
+        </div>
+        <hr>
+        <div id="currentBeatSection2">
+            <h2>现状Beat：ADR</h2>
+            <table id="currentBeatTable2"></table>
+        </div>
+        <hr>
+        <div id="strategyBeatSection2">
+            <h2>策略Beat：ADR</h2>
+            <table id="strategyBeatTable2"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const taskSelector1 = document.getElementById('taskSelector1');
+        const taskSelector2 = document.getElementById('taskSelector2');
+
+        fetch('data_0816.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(jsonData => {
+                const taskData = jsonData.data;
+                if (!taskData || taskData.length === 0) {
+                    document.body.innerHTML = "<h1>数据文件为空或格式不正确。</h1>";
+                    return;
+                }
+
+                // Populate both selectors with task options
+                taskData.forEach(item => {
+                    const option1 = document.createElement('option');
+                    option1.value = item.taskName;
+                    option1.textContent = item.taskName;
+                    taskSelector1.appendChild(option1);
+
+                    const option2 = document.createElement('option');
+                    option2.value = item.taskName;
+                    option2.textContent = item.taskName;
+                    taskSelector2.appendChild(option2);
+                });
+
+                // Set up event listeners for both selectors
+                taskSelector1.addEventListener('change', (event) => {
+                    const selectedTaskName = event.target.value;
+                    const selectedData = taskData.find(item => item.taskName === selectedTaskName);
+                    if (selectedData) {
+                        renderData(selectedData, 1);
+                    }
+                });
+
+                taskSelector2.addEventListener('change', (event) => {
+                    const selectedTaskName = event.target.value;
+                    const selectedData = taskData.find(item => item.taskName === selectedTaskName);
+                    if (selectedData) {
+                        renderData(selectedData, 2);
+                    }
+                });
+
+                // Render initial data for both panes
+                if (taskData.length > 0) {
+                    renderData(taskData[0], 1);
+                    if (taskData.length > 1) {
+                        renderData(taskData[1], 2);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error("加载JSON文件时发生错误:", error);
+                document.body.innerHTML = `<h1>加载数据失败：请确保 data.json 文件位于与 visualize.html 同一个文件夹下，并且文件格式正确。</h1><p>错误信息: ${error.message}</p>`;
+            });
+    });
+
+    /**
+     * Helper function to generate a color based on a value.
+     * Maps a value from 0 to 1 to a color in a gradient.
+     * @param {number} value - The numerical value (e.g., 0.1 for 10%)
+     * @returns {string} The HSL color string.
+     */
+    function getColor(value) {
+        // Map value from [0, 1] to a color gradient.
+        // Using HSL: h=210 (blue), s=100%, l varies from light to dark.
+        const maxVal = 0.5; // Assuming max percentage is 50% for color scaling
+        const normalizedValue = Math.min(value, maxVal) / maxVal;
+        const lightness = 95 - (normalizedValue * 50); // From 95% (lightest) to 45% (darkest)
+        return `hsl(210, 100%, ${lightness}%)`;
+    }
+
+    /**
+     * Renders a table with or without heatmap styling.
+     * @param {string} containerId - The ID of the container to render the table in.
+     * @param {Array<string>} headers - An array of table headers.
+     * @param {Array<Object>} rows - An array of objects representing table rows.
+     * @param {boolean} isHeatmap - Whether to apply heatmap styling.
+     */
+    function createTable(containerId, headers, rows, isHeatmap = false) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        const table = document.createElement('table');
+
+        const thead = table.createTHead();
+        const headerRow = thead.insertRow();
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+
+        const tbody = table.createTBody();
+        rows.forEach(rowData => {
+            const tr = tbody.insertRow();
+            let columnIndex = 0;
+            const keys = Object.keys(rowData);
+            for (const key of keys) {
+                const td = tr.insertCell();
+                td.textContent = rowData[key];
+
+                // Apply heatmap styling if enabled, but exclude the first column (ADR)
+                // and the last column (Total).
+                if (isHeatmap && columnIndex !== 0 && columnIndex < keys.length - 1) {
+                    const valueString = rowData[key];
+                    const numericValue = parseFloat(valueString.replace('%', '')) / 100;
+                    if (!isNaN(numericValue) && numericValue >= 0) {
+                        td.style.backgroundColor = getColor(numericValue);
+                        td.classList.add('heatmap-cell');
+                        td.style.color = '#000'; // Ensure text is visible
+                    }
+                }
+                columnIndex++;
+            }
+        });
+        container.appendChild(table);
+    }
+
+    function renderData(data, paneIndex) {
+        if (!data) return;
+
+        // 1. Render main metrics table (no heatmap)
+        const mainMetricsHeaders = ["策略前间夜占比", "佣金率_策略前", "佣金率_策略后", "佣金率变化", "佣金变化", "佣金lift"];
+        const mainMetricsRow = {
+            "roomNightProdRatio": data.roomNightProdRatio,
+            "commissionProdRate": data.commissionProdRate,
+            "commissionRate": data.commissionRate,
+            "commissionRateDiff": data.commissionRateDiff,
+            "commissionDiff": data.commissionDiff,
+            "commissionLift": data.commissionLift
+        };
+        createTable(`mainMetricsTable${paneIndex}`, mainMetricsHeaders, [mainMetricsRow]);
+
+        // 2. Render platform config table with sorting (no heatmap)
+        const platformConfigHeaders = ["ADR", "CEQM", "QC", "ROI"];
+        const platformConfigRows = data.parameters || [];
+        const parameterIdDisplay = document.getElementById(`parameterIdDisplay${paneIndex}`);
+        parameterIdDisplay.textContent = data.parameterId;
+
+        const adrOrder = ["100-", "100-200", "200-300", "300-400", "400-600", "600-1000", "1000-1500", "1500+"];
+
+        platformConfigRows.sort((a, b) => {
+            const adrA = a.ADR;
+            const adrB = b.ADR;
+            return adrOrder.indexOf(adrA) - adrOrder.indexOf(adrB);
+        });
+
+        createTable(`platformConfigTable${paneIndex}`, platformConfigHeaders, platformConfigRows);
+
+        // 3. Render current beat table as a heatmap
+        const beatProdDistHeaders = ["ADR", "0.0%", "0.5%", "1.0%", "1.5%", "2.0%", "2.5%", "3.0%", "3.5%", "4.0%", "不可定价", "变价", "无fbr", "总计"];
+        const beatProdDistRows = data.beatProdDist.rows.map(row => {
+            const flatRow = {};
+            for (const key in row) {
+                if (row[key] && row[key].value !== undefined) {
+                    flatRow[key] = row[key].value;
+                } else {
+                    flatRow[key] = row[key];
+                }
+            }
+            return flatRow;
+        });
+        createTable(`currentBeatTable${paneIndex}`, beatProdDistHeaders, beatProdDistRows, true);
+
+        // 4. Render strategy beat table as a heatmap
+        const beatDistHeaders = ["ADR", "0.0%", "0.5%", "1.0%", "1.5%", "2.0%", "2.5%", "3.0%", "3.5%", "4.0%", "不可定价", "变价", "无fbr", "总计"];
+        const beatDistRows = data.beatDist.rows.map(row => {
+            const flatRow = {};
+            for (const key in row) {
+                if (row[key] && row[key].value !== undefined) {
+                    flatRow[key] = row[key].value;
+                } else {
+                flatRow[key] = row[key];
+                }
+            }
+            return flatRow;
+        });
+        createTable(`strategyBeatTable${paneIndex}`, beatDistHeaders, beatDistRows, true);
+    }
+</script>
+
+</body>
+</html>
