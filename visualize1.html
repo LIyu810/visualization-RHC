@@ -9,19 +9,69 @@
             font-family: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f9f9f9;
+            background-color: #f0f2f5;
             color: #333;
         }
-        .container {
+        .main-container {
             max-width: 3200px;
             margin: 20px auto;
+        }
+        .top-section {
             background: #fff;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        .top-section h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .top-section p.conclusion {
+            font-size: 1.2em;
+            line-height: 1.6;
+            text-align: center;
+            color: #555;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        /* Updated chart container styles for a single row layout */
+        .charts-row-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin-top: 10px;
+            /* Added a background and padding to act as a single box for both charts */
+            background: #fafafa;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        .chart-wrapper {
+            flex: 1;
+            max-width: 48%; /* Adjusted to give each chart more space */
+            background: #fff; /* Individual chart backgrounds for contrast */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .chart-wrapper h2 {
+            text-align: center;
+            color: #34495e;
+            margin-bottom: 12px;
+            font-size: 1.8em;
+        }
+        .compare-container {
             display: flex;
             justify-content: space-between;
             gap: 40px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-top: 15px;
         }
         .compare-pane {
             flex: 1;
@@ -87,74 +137,124 @@
             font-weight: bold;
             color: #3498db;
         }
-
-        /* Styles for the heatmap cells */
         .heatmap-cell {
             transition: background-color 0.3s ease;
+        }
+
+        /* D3.js Chart Styles */
+        .chart-line {
+            fill: none;
+            stroke-width: 3px;
+        }
+        .dot {
+            fill: #fff;
+            stroke-width: 2px;
+        }
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            padding: 8px;
+            font: 12px sans-serif;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .y-axis-label {
+            font-size: 14px;
+            font-weight: bold;
+            fill: #666;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="compare-pane left-pane">
-        <h1>版本一</h1>
-        <div class="filter-section">
-            <label for="taskSelector1">选择任务:</label>
-            <select id="taskSelector1"></select>
-        </div>
-        <hr>
-        <div id="mainMetricsSection1">
-            <h2>主指标</h2>
-            <table id="mainMetricsTable1"></table>
-        </div>
-        <hr>
-        <div id="platformConfigSection1">
-            <h2>平台主张配置</h2>
-            <p>参数ID: <span id="parameterIdDisplay1"></span></p>
-            <table id="platformConfigTable1"></table>
-        </div>
-        <hr>
-        <div id="currentBeatSection1">
-            <h2>现状Beat：ADR</h2>
-            <table id="currentBeatTable1"></table>
-        </div>
-        <hr>
-        <div id="strategyBeatSection1">
-            <h2>策略Beat：ADR</h2>
-            <table id="strategyBeatTable1"></table>
+<div class="top-section">
+    <h1>实验结论</h1>
+    <p class="conclusion">
+        在映射关系配置固定场景下（2:1），随着平台主张策略调控不断激进，佣金率和佣金呈现线性下降趋势,佣金调控范围为:0.168-0.548<br>
+    </p>
+    <p class="data-source-right">
+        数据源：0824订单数据。
+    </p>
+
+        <div class="charts-row-container">
+            <div class="chart-wrapper">
+                <h2>佣金率变化</h2>
+                <div id="chart-commission-rate"></div>
+            </div>
+            <div class="chart-wrapper">
+                <h2>佣金变化</h2>
+                <div id="chart-commission"></div>
+            </div>
         </div>
     </div>
 
-    <div class="compare-pane right-pane">
-        <h1>版本二</h1>
-        <div class="filter-section">
-            <label for="taskSelector2">选择任务:</label>
-            <select id="taskSelector2"></select>
+    <div class="compare-container">
+        <div class="compare-pane left-pane">
+            <h1>版本一</h1>
+            <div class="filter-section">
+                <label for="taskSelector1">选择任务:</label>
+                <select id="taskSelector1"></select>
+            </div>
+            <hr>
+            <div id="mainMetricsSection1">
+                <h2>主指标</h2>
+                <table id="mainMetricsTable1"></table>
+            </div>
+            <hr>
+            <div id="platformConfigSection1">
+                <h2>平台主张配置</h2>
+                <p>参数ID: <span id="parameterIdDisplay1"></span></p>
+                <table id="platformConfigTable1"></table>
+            </div>
+            <hr>
+            <div id="currentBeatSection1">
+                <h2>现状Beat：ADR</h2>
+                <table id="currentBeatTable1"></table>
+            </div>
+            <hr>
+            <div id="strategyBeatSection1">
+                <h2>策略Beat：ADR</h2>
+                <table id="strategyBeatTable1"></table>
+            </div>
         </div>
-        <hr>
-        <div id="mainMetricsSection2">
-            <h2>主指标</h2>
-            <table id="mainMetricsTable2"></table>
-        </div>
-        <hr>
-        <div id="platformConfigSection2">
-            <h2>平台主张配置</h2>
-            <p>参数ID: <span id="parameterIdDisplay2"></span></p>
-            <table id="platformConfigTable2"></table>
-        </div>
-        <hr>
-        <div id="currentBeatSection2">
-            <h2>现状Beat：ADR</h2>
-            <table id="currentBeatTable2"></table>
-        </div>
-        <hr>
-        <div id="strategyBeatSection2">
-            <h2>策略Beat：ADR</h2>
-            <table id="strategyBeatTable2"></table>
+
+        <div class="compare-pane right-pane">
+            <h1>版本二</h1>
+            <div class="filter-section">
+                <label for="taskSelector2">选择任务:</label>
+                <select id="taskSelector2"></select>
+            </div>
+            <hr>
+            <div id="mainMetricsSection2">
+                <h2>主指标</h2>
+                <table id="mainMetricsTable2"></table>
+            </div>
+            <hr>
+            <div id="platformConfigSection2">
+                <h2>平台主张配置</h2>
+                <p>参数ID: <span id="parameterIdDisplay2"></span></p>
+                <table id="platformConfigTable2"></table>
+            </div>
+            <hr>
+            <div id="currentBeatSection2">
+                <h2>现状Beat：ADR</h2>
+                <table id="currentBeatTable2"></table>
+            </div>
+            <hr>
+            <div id="strategyBeatSection2">
+                <h2>策略Beat：ADR</h2>
+                <table id="strategyBeatTable2"></table>
+            </div>
         </div>
     </div>
 </div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -175,7 +275,6 @@
                     return;
                 }
 
-                // Populate both selectors with task options
                 taskData.forEach(item => {
                     const option1 = document.createElement('option');
                     option1.value = item.taskName;
@@ -188,7 +287,6 @@
                     taskSelector2.appendChild(option2);
                 });
 
-                // Set up event listeners for both selectors
                 taskSelector1.addEventListener('change', (event) => {
                     const selectedTaskName = event.target.value;
                     const selectedData = taskData.find(item => item.taskName === selectedTaskName);
@@ -205,7 +303,6 @@
                     }
                 });
 
-                // Render initial data for both panes
                 if (taskData.length > 0) {
                     renderData(taskData[0], 1);
                     if (taskData.length > 1) {
@@ -217,30 +314,118 @@
                 console.error("加载JSON文件时发生错误:", error);
                 document.body.innerHTML = `<h1>加载数据失败：请确保 data.json 文件位于与 visualize.html 同一个文件夹下，并且文件格式正确。</h1><p>错误信息: ${error.message}</p>`;
             });
+
+        const chartData = [
+            { strategy: "Revenue-100%", commissionRateChange: 0.548, commissionChange: 1064670 },
+            { strategy: "RoomNight-20%", commissionRateChange: 0.451, commissionChange: 879591 },
+            { strategy: "RoomNight-50%", commissionRateChange: 0.371, commissionChange: 720594 },
+            { strategy: "RoomNight-80%", commissionRateChange: 0.194, commissionChange: 378014 },
+            { strategy: "RoomNight-100", commissionRateChange: 0.168, commissionChange: 328514 }
+        ];
+
+        renderSingleLineChart("chart-commission-rate", chartData, "commissionRateChange", "佣金率变化", "#3498db");
+        renderSingleLineChart("chart-commission", chartData, "commissionChange", "佣金变化", "#e74c3c");
     });
 
     /**
-     * Helper function to generate a color based on a value.
-     * Maps a value from 0 to 1 to a color in a gradient.
-     * @param {number} value - The numerical value (e.g., 0.1 for 10%)
-     * @returns {string} The HSL color string.
+     * Renders a single line chart using D3.js.
      */
+    function renderSingleLineChart(containerId, data, valueKey, yAxisLabel, color) {
+        const svgContainer = d3.select(`#${containerId}`);
+        const margin = { top: 20, right: 30, bottom: 80, left: 100 }; // Increased left margin for y-axis label
+        const width = 700 - margin.left - margin.right; // Increased width
+        const height = 450 - margin.top - margin.bottom; // Increased height
+
+        // Clear previous chart
+        svgContainer.html("");
+
+        const svg = svgContainer.append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const xScale = d3.scalePoint()
+            .domain(data.map(d => d.strategy))
+            .range([0, width])
+            .padding(0.5);
+
+        const yScale = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d[valueKey]) * 1.1])
+            .range([height, 0]);
+
+        const xAxis = d3.axisBottom(xScale);
+        const yAxis = d3.axisLeft(yScale)
+            .ticks(5)
+            .tickFormat(d => {
+                if (valueKey === "commissionChange") {
+                    return d3.format(".2s")(d);
+                }
+                return d3.format(".2f")(d);
+            });
+
+        svg.append("g")
+            .attr("transform", `translate(0,${height})`)
+            .call(xAxis)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-45)")
+            .style("font-size", "14px");
+
+        svg.append("g")
+            .call(yAxis)
+            .style("font-size", "14px");
+
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", -margin.left + 20)
+            .attr("x", -height / 2)
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .attr("class", "y-axis-label")
+            .text(yAxisLabel);
+
+        const line = d3.line()
+            .x(d => xScale(d.strategy))
+            .y(d => yScale(d[valueKey]));
+
+        svg.append("path")
+            .datum(data)
+            .attr("class", "chart-line")
+            .attr("stroke", color)
+            .attr("d", line);
+
+        const tooltip = d3.select("body").append("div")
+            .attr("class", "tooltip");
+
+        svg.selectAll(".dot")
+            .data(data)
+            .enter().append("circle")
+            .attr("class", "dot")
+            .attr("cx", d => xScale(d.strategy))
+            .attr("cy", d => yScale(d[valueKey]))
+            .attr("r", 6)
+            .attr("stroke", color)
+            .on("mouseover", (event, d) => {
+                tooltip.style("opacity", 1)
+                    .html(`策略: ${d.strategy}<br>${yAxisLabel}: ${d[valueKey].toLocaleString()}`)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 28) + "px");
+            })
+            .on("mouseout", () => {
+                tooltip.style("opacity", 0);
+            });
+    }
+
     function getColor(value) {
-        // Map value from [0, 1] to a color gradient.
-        // Using HSL: h=210 (blue), s=100%, l varies from light to dark.
-        const maxVal = 0.5; // Assuming max percentage is 50% for color scaling
+        const maxVal = 0.5;
         const normalizedValue = Math.min(value, maxVal) / maxVal;
-        const lightness = 95 - (normalizedValue * 50); // From 95% (lightest) to 45% (darkest)
+        const lightness = 95 - (normalizedValue * 50);
         return `hsl(210, 100%, ${lightness}%)`;
     }
 
-    /**
-     * Renders a table with or without heatmap styling.
-     * @param {string} containerId - The ID of the container to render the table in.
-     * @param {Array<string>} headers - An array of table headers.
-     * @param {Array<Object>} rows - An array of objects representing table rows.
-     * @param {boolean} isHeatmap - Whether to apply heatmap styling.
-     */
     function createTable(containerId, headers, rows, isHeatmap = false) {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
@@ -263,15 +448,13 @@
                 const td = tr.insertCell();
                 td.textContent = rowData[key];
 
-                // Apply heatmap styling if enabled, but exclude the first column (ADR)
-                // and the last column (Total).
                 if (isHeatmap && columnIndex !== 0 && columnIndex < keys.length - 1) {
                     const valueString = rowData[key];
                     const numericValue = parseFloat(valueString.replace('%', '')) / 100;
                     if (!isNaN(numericValue) && numericValue >= 0) {
                         td.style.backgroundColor = getColor(numericValue);
                         td.classList.add('heatmap-cell');
-                        td.style.color = '#000'; // Ensure text is visible
+                        td.style.color = '#000';
                     }
                 }
                 columnIndex++;
@@ -283,7 +466,6 @@
     function renderData(data, paneIndex) {
         if (!data) return;
 
-        // 1. Render main metrics table (no heatmap)
         const mainMetricsHeaders = ["策略前间夜占比", "佣金率_策略前", "佣金率_策略后", "佣金率变化", "佣金变化", "佣金lift"];
         const mainMetricsRow = {
             "roomNightProdRatio": data.roomNightProdRatio,
@@ -295,7 +477,6 @@
         };
         createTable(`mainMetricsTable${paneIndex}`, mainMetricsHeaders, [mainMetricsRow]);
 
-        // 2. Render platform config table with sorting (no heatmap)
         const platformConfigHeaders = ["ADR", "CEQM", "QC", "ROI"];
         const platformConfigRows = data.parameters || [];
         const parameterIdDisplay = document.getElementById(`parameterIdDisplay${paneIndex}`);
@@ -311,7 +492,6 @@
 
         createTable(`platformConfigTable${paneIndex}`, platformConfigHeaders, platformConfigRows);
 
-        // 3. Render current beat table as a heatmap
         const beatProdDistHeaders = ["ADR", "0.0%", "0.5%", "1.0%", "1.5%", "2.0%", "2.5%", "3.0%", "3.5%", "4.0%", "不可定价", "变价", "无fbr", "总计"];
         const beatProdDistRows = data.beatProdDist.rows.map(row => {
             const flatRow = {};
@@ -326,7 +506,6 @@
         });
         createTable(`currentBeatTable${paneIndex}`, beatProdDistHeaders, beatProdDistRows, true);
 
-        // 4. Render strategy beat table as a heatmap
         const beatDistHeaders = ["ADR", "0.0%", "0.5%", "1.0%", "1.5%", "2.0%", "2.5%", "3.0%", "3.5%", "4.0%", "不可定价", "变价", "无fbr", "总计"];
         const beatDistRows = data.beatDist.rows.map(row => {
             const flatRow = {};
@@ -334,7 +513,7 @@
                 if (row[key] && row[key].value !== undefined) {
                     flatRow[key] = row[key].value;
                 } else {
-                flatRow[key] = row[key];
+                    flatRow[key] = row[key];
                 }
             }
             return flatRow;
