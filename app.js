@@ -2442,7 +2442,7 @@ function attachEvents(){document.getElementById('filters').addEventListener('sub
     updateChartsWithGrouping(currentGroupBy, currentGroups);
   }
   const weatherDate=document.getElementById('weatherDate');if(weatherDate){weatherDate.addEventListener('change',updateWeatherViews)}
-  document.addEventListener('click',e=>{const btn=e.target.closest('.sub-actions .ghost');if(btn){const t=btn.dataset.chart;alert((t==='product'?'产品力':'收益策略')+' 的分日期数据（mock）')}});window.addEventListener('resize',()=>{[chartProduct,chartThird,chartHotelStrategyBar,chartHotelStrategyPie,chartPriceBeatAlgo,chartPriceBeatOrder,chartPriceFunnel,chartPriceEffectPie,chartTargetBar,chartElasticBar,chartQCBox,chartCEQMBox,chartDynDist,chartDailyAbnormal,chartWeatherAbnormal,chartHotEvent,chartDynFunnel,chartWeatherProvinceShare,chartWeatherLevelByProvince].forEach(c=>c&&c.resize())});
+  document.addEventListener('click',e=>{const btn=e.target.closest('.sub-actions .ghost');if(btn){const t=btn.dataset.chart;const chartNames={'product':'产品力','third':'收益策略','hotel-strategy-bar':'酒店群策略分布（柱状）','hotel-strategy-pie':'酒店群策略分布（饼图）','price-beat-algo':'货定价Beat分布（算法输出）','price-beat-order':'货定价Beat分布','price-inconsistency':'策略落地不一致归因','target-bar':'定价目标','elastic-bar':'价格弹性','qc-box':'Q/C市占','ceqm-box':'CEQ/M市占','dyn-dist':'策略间夜分布','daily-abnormal':'日常异常策略分布','weather-abnormal':'异常天气策略分布','hot-event':'热点事件分布','dyn-inconsistency':'动态定价策略落地不一致归因'};alert(chartNames[t]||t+' 的分日期数据（mock）')}});window.addEventListener('resize',()=>{[chartProduct,chartThird,chartHotelStrategyBar,chartHotelStrategyPie,chartPriceBeatAlgo,chartPriceBeatOrder,chartPriceFunnel,chartPriceEffectPie,chartTargetBar,chartElasticBar,chartQCBox,chartCEQMBox,chartDynDist,chartDailyAbnormal,chartWeatherAbnormal,chartHotEvent,chartDynFunnel,chartWeatherProvinceShare,chartWeatherLevelByProvince].forEach(c=>c&&c.resize())});
   refreshCustomVisibility();
   
   // Sidebar functionality
@@ -2450,6 +2450,39 @@ function attachEvents(){document.getElementById('filters').addEventListener('sub
   
   // 初始化热点日历看板
   initHotEventsCalendar();
+  
+  // 初始化异常提醒卡片
+  initAbnormalReminder();
+}
+
+// 初始化异常提醒卡片
+function initAbnormalReminder() {
+  const clickableElement = document.querySelector('.clickable[data-target="revenue-strategy-beat"]');
+  
+  if (clickableElement) {
+    clickableElement.addEventListener('click', () => {
+      // 滚动到收益策略Beat分布位置
+      const targetElement = document.querySelector('#beat-distribution .subcard:nth-child(2)');
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+        
+        // 高亮显示目标区域
+        targetElement.style.background = '#fef3c7';
+        targetElement.style.border = '2px solid #f59e0b';
+        targetElement.style.transform = 'scale(1.02)';
+        
+        // 3秒后恢复原样
+        setTimeout(() => {
+          targetElement.style.background = '';
+          targetElement.style.border = '';
+          targetElement.style.transform = '';
+        }, 3000);
+      }
+    });
+  }
 }
 
 function initSidebar(){
