@@ -91,6 +91,20 @@
   </nav>
     
     <main class="container">
+      <!-- 异常提醒卡片 -->
+      <div class="abnormal-reminder-card">
+        <div class="reminder-icon">!</div>
+        <div class="reminder-content">
+          <div class="reminder-title">异常提醒</div>
+          <div class="reminder-message">
+            星级维度存在异常:
+            <span class="highlight-blue clickable" data-target="revenue-strategy-beat">收益策略beat分布</span>
+            ，高星beat0环比前日异常
+            <span class="highlight-red">+3.5%</span>
+            <span class="highlight-gray">(历史1个月标准差0.5%)</span>
+          </div>
+        </div>
+      </div>
     <section class="card" id="global-filters">
       <div class="card-title">全局筛选</div>
       <form id="filters" class="filters-grid">
@@ -363,10 +377,12 @@
       <div class="subcard">
         <div class="subcard-title">酒店群策略分布（柱状）</div>
         <div id="chartHotelStrategyBar" class="chart"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="hotel-strategy-bar">查看分日期数据</button></div>
       </div>
       <div class="subcard">
         <div class="subcard-title">酒店群策略分布（饼图）</div>
         <div id="chartHotelStrategyPie" class="chart"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="hotel-strategy-pie">查看分日期数据</button></div>
       </div>
     </section>
 
@@ -375,10 +391,12 @@
       <div class="subcard">
         <div class="subcard-title">货定价Beat分布（算法输出）</div>
         <div id="chartPriceBeatAlgo" class="chart"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="price-beat-algo">查看分日期数据</button></div>
       </div>
       <div class="subcard">
         <div class="subcard-title">货定价Beat分布</div>
         <div id="chartPriceBeatOrder" class="chart"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="price-beat-order">查看分日期数据</button></div>
       </div>
       <div class="grid-2">
         <div class="subcard">
@@ -403,24 +421,29 @@
       <div class="subcard">
         <div class="subcard-title">策略落地不一致归因</div>
         <div id="chartInconsistencyReasons" class="chart" style="height:400px"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="price-inconsistency">查看分日期数据</button></div>
       </div>
 
       <div class="module-title" style="margin-top:8px">策略影响因子</div>
       <div class="subcard">
         <div class="subcard-title">定价目标</div>
         <div id="chartTargetBar" class="chart"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="target-bar">查看分日期数据</button></div>
       </div>
       <div class="subcard">
         <div class="subcard-title">价格弹性</div>
         <div id="chartElasticBar" class="chart"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="elastic-bar">查看分日期数据</button></div>
       </div>
       <div class="subcard">
         <div class="subcard-title">Q/C市占</div>
         <div id="chartQCBox" class="chart"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="qc-box">查看分日期数据</button></div>
       </div>
       <div class="subcard">
         <div class="subcard-title">CEQ/M市占</div>
         <div id="chartCEQMBox" class="chart"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="ceqm-box">查看分日期数据</button></div>
       </div>
     </section>
 
@@ -464,22 +487,26 @@
       <div class="subcard">
         <div class="subcard-title">策略间夜分布</div>
         <div id="chartDynDist" class="chart" style="height:220px"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="dyn-dist">查看分日期数据</button></div>
       </div>
       
       <!-- 三个看板 -->
       <div class="subcard">
         <div class="subcard-title">日常异常策略分布</div>
         <div id="chartDailyAbnormal" class="chart" style="height:220px"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="daily-abnormal">查看分日期数据</button></div>
       </div>
       
       <div class="subcard">
         <div class="subcard-title">异常天气策略分布</div>
         <div id="chartWeatherAbnormal" class="chart" style="height:220px"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="weather-abnormal">查看分日期数据</button></div>
       </div>
       
       <div class="subcard">
         <div class="subcard-title">热点事件分布</div>
         <div id="chartHotEvent" class="chart" style="height:220px"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="hot-event">查看分日期数据</button></div>
       </div>
       
       <div class="subcard">
@@ -499,6 +526,7 @@
       <div class="subcard">
         <div class="subcard-title">策略落地不一致归因</div>
         <div id="chartDynInconsistencyReasons" class="chart" style="height:400px"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="dyn-inconsistency">查看分日期数据</button></div>
       </div>
     </section>
 
