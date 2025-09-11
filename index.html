@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>收益策略看板</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/extension/dataTool.min.js"></script>
+</head>
+<body>
+  <!-- Premium Navigation Bar -->
+  <nav class="modern-nav" id="modernNav">
+    <div class="nav-wrapper">
+      <!-- Brand -->
+      <div class="nav-brand">
+        <div class="brand-icon">📊</div>
+        <div class="brand-text">
+          <h1>收益策略看板</h1>
+          <span>Revenue Strategy Dashboard</span>
+        </div>
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <div class="nav-menu">
+        <a href="#global-filters" class="nav-item">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">全局筛选</span>
+        </a>
+        <a href="#beat-distribution" class="nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">人货场策略Beat分布</span>
+        </a>
+        <a href="#hotel-strategy" class="nav-item">
+          <span class="nav-icon">🏨</span>
+          <span class="nav-label">定价策略分布</span>
+        </a>
+        <a href="#pricing-strategy" class="nav-item">
+          <span class="nav-icon">💰</span>
+          <span class="nav-label">货定价策略</span>
+        </a>
+        <a href="#dynamic-pricing" class="nav-item">
+          <span class="nav-icon">⚡</span>
+          <span class="nav-label">动态定价策略</span>
+        </a>
+        <a href="#hot-events" class="nav-item">
+          <span class="nav-icon">🔥</span>
+          <span class="nav-label">动态定价策略因子</span>
+        </a>
+      </div>
+      
+      <!-- Mobile Toggle -->
+      <button class="mobile-toggle" id="mobileToggle">
+        <span class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-nav-content">
+        <a href="#global-filters" class="mobile-nav-item">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">全局筛选</span>
+        </a>
+        <a href="#beat-distribution" class="mobile-nav-item">
+          <span class="nav-icon">📈</span>
+          <span class="nav-label">人货场策略Beat分布</span>
+        </a>
+        <a href="#hotel-strategy" class="mobile-nav-item">
+          <span class="nav-icon">🏨</span>
+          <span class="nav-label">酒店群策略分布</span>
+        </a>
+        <a href="#pricing-strategy" class="mobile-nav-item">
+          <span class="nav-icon">💰</span>
+          <span class="nav-label">货定价策略</span>
+        </a>
+        <a href="#dynamic-pricing" class="mobile-nav-item">
+          <span class="nav-icon">⚡</span>
+          <span class="nav-label">动态定价策略</span>
+        </a>
+        <a href="#hot-events" class="mobile-nav-item">
+          <span class="nav-icon">🔥</span>
+          <span class="nav-label">近15天TOP热点事件</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+    
+    <main class="container">
+    <section class="card" id="global-filters">
+      <div class="card-title">全局筛选</div>
+      <form id="filters" class="filters-grid">
+        <div class="filter-item">
+          <label>开始日期</label>
+          <input type="date" id="startDate" required>
+        </div>
+        <div class="filter-item">
+          <label>结束日期</label>
+          <input type="date" id="endDate" required>
+        </div>
+
+        <div class="filter-item">
+          <label>统计口径</label>
+          <select id="statCaliber" class="js-multi">
+            <option value="">全部</option>
+            <option value="reserve">预定</option>
+            <option value="checkout">离店</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>星级</label>
+          <select id="starLevel" class="js-multi">
+            <option value="">全部</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>酒店星级类型</label>
+          <select id="hotelStarType" class="js-multi">
+            <option value="">全部</option>
+            <option value="high">高星</option>
+            <option value="mid">中星</option>
+            <option value="low">低星</option>
+            <option value="chain">连锁</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>ADR</label>
+          <select id="adr" class="js-multi">
+            <option value="">全部</option>
+            <option value="100-">(-∞~100)</option>
+            <option value="100-200">[100~200)</option>
+            <option value="200-300">[200~300)</option>
+            <option value="300-400">[300~400)</option>
+            <option value="400-500">[400~500)</option>
+            <option value="500-600">[500~600)</option>
+            <option value="600-800">[600~800)</option>
+            <option value="800-1000">[800~1000)</option>
+            <option value="1000-1500">[1000~1500)</option>
+            <option value="1500+">[1500~+∞)</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>挂牌等级</label>
+          <select id="boardLevel" class="js-multi">
+            <option value="">全部</option>
+            <option>无牌</option>
+            <option>特牌</option>
+            <option>蓝牌</option>
+            <option>金牌</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>是否早订</label>
+          <select id="earlyBook" class="js-multi">
+            <option value="">全部</option>
+            <option>是</option>
+            <option>否</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>是否连住</label>
+          <select id="multiNight" class="js-multi">
+            <option value="">全部</option>
+            <option>是</option>
+            <option>否</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>新老客</label>
+          <select id="newOld" class="js-multi">
+            <option value="">全部</option>
+            <option>新客</option>
+            <option>老客</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>C365用户</label>
+          <select id="c365" class="js-multi">
+            <option value="">全部</option>
+            <option>是</option>
+            <option>否</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>城市线级</label>
+          <select id="cityTier" class="js-multi">
+            <option value="">全部</option>
+            <option>新一线</option>
+            <option>一线</option>
+            <option>二线</option>
+            <option>三线</option>
+            <option>四线</option>
+            <option>五线</option>
+            <option>五线以下</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>平台主张</label>
+          <select id="platformClaim" class="js-multi">
+            <option value="">全部</option>
+            <option>ROI阈值下间夜最大化</option>
+            <option>长期收益最大化</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>酒店类型</label>
+          <select id="hotelType" class="js-multi">
+            <option value="">全部</option>
+            <option>单体酒店</option>
+            <option>民宿</option>
+            <option>特色住宿</option>
+            <option>集团酒店</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>流量规模</label>
+          <select id="trafficScale" class="js-multi">
+            <option value="">全部</option>
+            <option>低</option>
+            <option>中低</option>
+            <option>中高</option>
+            <option>高</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label>酒店规模</label>
+          <select id="hotelScale" class="js-multi">
+            <option value="">全部</option>
+            <option>1-30</option>
+            <option>31-70</option>
+            <option>71-120</option>
+            <option>121+</option>
+          </select>
+        </div>
+
+        <div class="filter-item col-2">
+          <label>省份</label>
+          <div class="text-filter">
+            <select id="provinceOp">
+              <option value="eq">==</option>
+              <option value="in">in</option>
+              <option value="contains">包含</option>
+              <option value="not_contains">不包含</option>
+            </select>
+            <input id="provinceInput" type="text" placeholder="输入值；多值用分号分隔（默认：全部）">
+          </div>
+          <input type="hidden" id="province" value="">
+        </div>
+
+        <div class="filter-item col-2">
+          <label>城市</label>
+          <div class="text-filter">
+            <select id="cityOp">
+              <option value="eq">==</option>
+              <option value="in">in</option>
+              <option value="contains">包含</option>
+              <option value="not_contains">不包含</option>
+            </select>
+            <input id="cityInput" type="text" placeholder="输入值；多值用分号分隔（默认：全部）">
+          </div>
+          <input type="hidden" id="city" value="">
+        </div>
+
+        <div class="filter-item col-2">
+          <label>商圈</label>
+          <div class="text-filter">
+            <select id="bizOp">
+              <option value="eq">==</option>
+              <option value="in">in</option>
+              <option value="contains">包含</option>
+              <option value="not_contains">不包含</option>
+            </select>
+            <input id="bizInput" type="text" placeholder="输入值；多值用分号分隔（默认：全部）">
+          </div>
+          <input type="hidden" id="biz" value="">
+        </div>
+
+        <div class="filter-actions col-2">
+          <button type="button" id="resetBtn">重置</button>
+          <button type="submit" id="applyBtn">应用筛选</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 全局分组 -->
+    <section class="card" id="global-grouping">
+      <div class="module-title">全局分组</div>
+      <div class="filters-grid">
+        <div class="filter-item">
+          <label for="groupBy">分组维度</label>
+          <select id="groupBy">
+            <option value="">整体（默认）</option>
+            <optgroup label="可选项">
+              <option value="star">星级 (5)</option>
+              <option value="starType">星级类型 (4)</option>
+              <option value="adr">ADR (7)</option>
+              <option value="listingLevel">挂牌等级 (4)</option>
+              <option value="earlyBooking">是否早订 (2)</option>
+              <option value="continuousStay">是否连住 (2)</option>
+              <option value="newOldGuest">新老客 (2)</option>
+              <option value="c365User">C365用户 (2)</option>
+              <option value="cityLevel">城市线级 (7)</option>
+              <option value="platformAdvocacy">平台主张 (2)</option>
+              <option value="hotelType">酒店类型 (4)</option>
+              <option value="trafficScale">流量规模 (4)</option>
+              <option value="hotelScale">酒店规模 (4)</option>
+            </optgroup>
+            <optgroup label="手动输入">
+              <option value="province">省份 (34)</option>
+              <option value="city">城市 (660)</option>
+              <option value="biz">商圈 (2800+)</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="filter-item" id="groupCustomWrapper" style="display:none">
+          <label id="groupCustomLabel">省份（分号分隔，最多10个）</label>
+          <div class="text-filter">
+            <input type="text" id="groupCustomInput" placeholder="示例：上海;北京;江苏">
+            <button type="button" id="groupApplyBtn" class="primary">确认</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="beat-distribution">
+      <div class="module-title">人货场策略Beat分布</div>
+      <div class="subcard">
+        <div class="subcard-title">产品力Beat分布</div>
+        <div id="chartProduct" class="chart"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="product">查看分日期数据</button></div>
+      </div>
+      <div class="subcard">
+        <div class="subcard-title">收益策略Beat分布</div>
+        <div id="chartThird" class="chart"></div>
+        <div class="sub-actions"><button type="button" class="ghost" data-chart="third">查看分日期数据</button></div>
+      </div>
+    </section>
+
+    <section class="card" id="hotel-strategy">
+      <div class="module-title">定价策略分布</div>
+      <div class="subcard">
+        <div class="subcard-title">酒店群策略分布（柱状）</div>
+        <div id="chartHotelStrategyBar" class="chart"></div>
+      </div>
+      <div class="subcard">
+        <div class="subcard-title">酒店群策略分布（饼图）</div>
+        <div id="chartHotelStrategyPie" class="chart"></div>
+      </div>
+    </section>
+
+    <section class="card" id="pricing-strategy">
+      <div class="module-title">货定价策略</div>
+      <div class="subcard">
+        <div class="subcard-title">货定价Beat分布（算法输出）</div>
+        <div id="chartPriceBeatAlgo" class="chart"></div>
+      </div>
+      <div class="subcard">
+        <div class="subcard-title">货定价Beat分布</div>
+        <div id="chartPriceBeatOrder" class="chart"></div>
+      </div>
+      <div class="grid-2">
+        <div class="subcard">
+          <div class="subcard-title">策略落地漏斗</div>
+          <div id="chartPriceFunnel" class="chart"></div>
+        </div>
+        <div class="subcard">
+          <div class="subcard-title">货定价生效数据分析</div>
+          <div id="chartPriceEffectPie" class="chart"></div>
+        </div>
+      </div>
+
+      <!-- 落地一致率趋势模块 -->
+     
+      <div class="subcard">
+        <div class="subcard-title">落地一致率趋势</div>
+        <div id="chartConsistencyTrend" class="chart" style="height:350px"></div>
+      </div>
+
+      <!-- 策略落地不一致归因模块 -->
+      <div class="module-title" style="margin-top:8px">策略落地不一致归因</div>
+      <div class="subcard">
+        <div class="subcard-title">策略落地不一致归因</div>
+        <div id="chartInconsistencyReasons" class="chart" style="height:400px"></div>
+      </div>
+
+      <div class="module-title" style="margin-top:8px">策略影响因子</div>
+      <div class="subcard">
+        <div class="subcard-title">定价目标</div>
+        <div id="chartTargetBar" class="chart"></div>
+      </div>
+      <div class="subcard">
+        <div class="subcard-title">价格弹性</div>
+        <div id="chartElasticBar" class="chart"></div>
+      </div>
+      <div class="subcard">
+        <div class="subcard-title">Q/C市占</div>
+        <div id="chartQCBox" class="chart"></div>
+      </div>
+      <div class="subcard">
+        <div class="subcard-title">CEQ/M市占</div>
+        <div id="chartCEQMBox" class="chart"></div>
+      </div>
+    </section>
+
+    <!-- 特征分布趋势模块 -->
+    <section class="card" id="feature-distribution-trends">
+      <div class="module-title">特征分布趋势</div>
+      
+      <!-- 平台主张分布 -->
+      <div class="subcard">
+        <div class="subcard-title">平台主张分布</div>
+        <div id="chartPlatformClaimTrend" class="chart" style="height:300px"></div>
+      </div>
+      
+      <!-- 酒店类型分布 -->
+      <div class="subcard">
+        <div class="subcard-title">酒店类型分布</div>
+        <div id="chartHotelTypeTrend" class="chart" style="height:300px"></div>
+      </div>
+      
+      <!-- 流量规模分布 -->
+      <div class="subcard">
+        <div class="subcard-title">流量规模分布</div>
+        <div id="chartTrafficScaleTrend" class="chart" style="height:300px"></div>
+      </div>
+      
+      <!-- 酒店规模分布 -->
+      <div class="subcard">
+        <div class="subcard-title">酒店规模分布</div>
+        <div id="chartHotelScaleTrend" class="chart" style="height:300px"></div>
+      </div>
+      
+      <!-- ADR分布 -->
+      <div class="subcard">
+        <div class="subcard-title">ADR分布</div>
+        <div id="chartADRTrend" class="chart" style="height:300px"></div>
+      </div>
+    </section>
+
+    <section class="card" id="dynamic-pricing">
+      <div class="module-title">动态定价策略</div>
+      <div class="subcard">
+        <div class="subcard-title">策略间夜分布</div>
+        <div id="chartDynDist" class="chart" style="height:220px"></div>
+      </div>
+      
+      <!-- 三个看板 -->
+      <div class="subcard">
+        <div class="subcard-title">日常异常策略分布</div>
+        <div id="chartDailyAbnormal" class="chart" style="height:220px"></div>
+      </div>
+      
+      <div class="subcard">
+        <div class="subcard-title">异常天气策略分布</div>
+        <div id="chartWeatherAbnormal" class="chart" style="height:220px"></div>
+      </div>
+      
+      <div class="subcard">
+        <div class="subcard-title">热点事件分布</div>
+        <div id="chartHotEvent" class="chart" style="height:220px"></div>
+      </div>
+      
+      <div class="subcard">
+        <div class="subcard-title">策略落地漏斗</div>
+        <div id="chartDynFunnel" class="chart" style="height:360px"></div>
+      </div>
+
+      <!-- 动态定价落地一致率趋势模块 -->
+      <div class="module-title" style="margin-top:8px">落地一致率趋势</div>
+      <div class="subcard">
+        <div class="subcard-title">落地一致率趋势</div>
+        <div id="chartDynConsistencyTrend" class="chart" style="height:350px"></div>
+      </div>
+
+      <!-- 动态定价策略落地不一致归因模块 -->
+      <div class="module-title" style="margin-top:8px">策略落地不一致归因</div>
+      <div class="subcard">
+        <div class="subcard-title">策略落地不一致归因</div>
+        <div id="chartDynInconsistencyReasons" class="chart" style="height:400px"></div>
+      </div>
+    </section>
+
+    <section class="card" id="hot-events">
+      <div class="module-title">动态定价策略因子</div>
+      
+      <!-- 流量 / COCC 子模块 -->
+      <div class="subcard" style="margin-bottom:20px">
+        <div class="subcard-title">流量 / COCC</div>
+        <div class="table-scroll">
+          <table class="data-table" id="tableCOCC">
+            <thead>
+              <tr>
+                <th>省份</th>
+                <th>城市</th>
+                <th>商圈</th>
+                <th>入离日期</th>
+                <th>策略</th>
+                <th>流量</th>
+                <th>流量阈值</th>
+                <th>间夜占比大盘</th>
+                <th>收益占比大盘</th>
+                <th>未来30天流量趋势</th>
+                <th>未来90天COCC趋势</th>
+                <th>未来90天COCC斜率</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <!-- 图表浮层 -->
+        <div class="chart-tooltip" id="chartTooltip">
+          <div class="chart-title" id="chartTooltipTitle"></div>
+          <div class="chart-container" id="chartTooltipContainer"></div>
+        </div>
+        
+        <!-- 事件浮层 -->
+        <div class="events-tooltip" id="eventsTooltip">
+          <div class="events-tooltip-title" id="eventsTooltipTitle"></div>
+          <div class="events-tooltip-content" id="eventsTooltipContent"></div>
+        </div>
+        
+        <!-- 完整数据浮层 -->
+        <div class="full-data-tooltip" id="fullDataTooltip">
+          <div class="full-data-tooltip-title" id="fullDataTooltipTitle"></div>
+          <div class="full-data-tooltip-content" id="fullDataTooltipContent"></div>
+        </div>
+      </div>
+
+      <!-- 异常天气感知 子模块 -->
+      <div class="subcard" style="margin-bottom:20px">
+        <div class="subcard-title">异常天气感知</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div class="weather-filter">
+            <label for="weatherDate" class="muted">选择日期</label>
+            <input type="date" id="weatherDate">
+          </div>
+        </div>
+        <div class="weather-summary-grid" style="margin-bottom:12px">
+          <div class="kpi-grid">
+            <div class="kpi-card red">
+              <div class="kpi-title">红色预警影响地级市数量</div>
+              <div class="kpi-value" id="kpiRed">0</div>
+            </div>
+            <div class="kpi-card orange">
+              <div class="kpi-title">橙色预警影响地级市数量</div>
+              <div class="kpi-value" id="kpiOrange">0</div>
+            </div>
+            <div class="kpi-card yellow">
+              <div class="kpi-title">黄色预警影响地级市数量</div>
+              <div class="kpi-value" id="kpiYellow">0</div>
+            </div>
+            <div class="kpi-card blue">
+              <div class="kpi-title">蓝色预警影响地级市数量</div>
+              <div class="kpi-value" id="kpiBlue">0</div>
+            </div>
+          </div>
+        </div>
+        <div class="subcard" style="padding:8px;margin-bottom:12px">
+          <div class="subcard-title" style="margin-bottom:4px">极端天气影响省份间夜占比（仅红/橙预警）</div>
+          <div id="chartWeatherProvinceShare" class="chart" style="height:260px"></div>
+        </div>
+        <div class="subcard" style="padding:8px;margin-bottom:12px">
+          <div class="subcard-title" style="margin-bottom:4px">各省份异常天气预警级别明细（单位：地级市数）</div>
+          <div id="chartWeatherLevelByProvince" class="chart" style="height:320px"></div>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="tableWeather">
+            <thead>
+              <tr>
+                <th>省份</th>
+                <th>城市</th>
+                <th>预警类型</th>
+                <th>预警级别</th>
+                <th>天气动态beat</th>
+                <th>间夜占比大盘</th>
+                <th>收益占比大盘</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 近15天TOP热点事件 子模块 -->
+      <div class="subcard">
+        <div class="subcard-title">热点事件分布</div>
+        <div class="table-scroll">
+          <table class="data-table" id="tableHotEvents">
+            <thead>
+              <tr>
+                <th>事件名</th>
+                <th>事件等级</th>
+                <th>省份</th>
+                <th>城市</th>
+                <th>入离日期</th>
+                <th>策略</th>
+                <th>间夜占比大盘</th>
+                <th>事件状态</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <!-- 热点日历看板 -->
+        <div class="hot-events-calendar">
+          <div class="calendar-header">
+            <h3>热点日历看板</h3>
+            <div class="calendar-nav">
+              <button id="prevMonth" class="nav-btn">‹</button>
+              <span id="currentMonth" class="month-display">2025年9月</span>
+              <button id="nextMonth" class="nav-btn">›</button>
+            </div>
+          </div>
+          <div class="calendar-container">
+            <div class="calendar-weekdays">
+              <div class="weekday">周一</div>
+              <div class="weekday">周二</div>
+              <div class="weekday">周三</div>
+              <div class="weekday">周四</div>
+              <div class="weekday">周五</div>
+              <div class="weekday">周六</div>
+              <div class="weekday">周日</div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+              <!-- 日历格子将通过JavaScript动态生成 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html> 
