@@ -712,6 +712,89 @@ table.data-table thead th{
 body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans",sans-serif;color:#111827;background:#f6f8fc}
 .container{padding-top:88px;transition:padding-top 0.3s cubic-bezier(0.4,0,0.2,1);max-width:1440px;margin:0 auto;padding-left:24px;padding-right:24px}
 
+/* 异常提醒卡片样式 */
+.abnormal-reminder-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border-left: 4px solid #dc2626;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.abnormal-reminder-card:hover {
+  box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+.reminder-icon {
+  width: 24px;
+  height: 24px;
+  background: #dc2626;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.reminder-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reminder-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #dc2626;
+  margin: 0;
+}
+
+.reminder-message {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.highlight-blue {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.highlight-red {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.highlight-gray {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.clickable {
+  cursor: pointer;
+  text-decoration: underline;
+  transition: all 0.2s ease;
+}
+
+.clickable:hover {
+  color: #1d4ed8;
+  text-decoration: none;
+  background: rgba(37, 99, 235, 0.1);
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
 /* Dynamic Pricing Strategy Factor Module */
 #hot-events .subcard{margin-bottom:20px;border:1px solid #e5e7eb;border-radius:12px;padding:16px;background:#f8fafc;transition:all 0.2s ease}
 #hot-events .subcard:hover{background:#f1f5f9;border-color:#cbd5e1;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
@@ -734,4 +817,23 @@ body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Ro
   .brand-text span{font-size:10px}
   .container{padding-top:72px;padding-left:16px;padding-right:16px}
   .mobile-menu{top:56px}
+  
+  .abnormal-reminder-card {
+    padding: 12px 16px;
+    margin-bottom: 16px;
+  }
+  
+  .reminder-title {
+    font-size: 14px;
+  }
+  
+  .reminder-message {
+    font-size: 13px;
+  }
+  
+  .reminder-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+  }
 } 
