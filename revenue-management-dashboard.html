@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>收益经营看板 - Revenue Management Dashboard</title>
+  <link rel="stylesheet" href="revenue-management-styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+  <nav class="modern-nav" id="modernNav">
+    <div class="nav-wrapper">
+      <div class="nav-brand">
+        <div class="brand-icon">📈</div>
+        <div class="brand-text">
+          <h1>收益经营看板</h1>
+          <span>Revenue Management Dashboard</span>
+        </div>
+      </div>
+      
+      <div class="nav-menu">
+        <a href="#global-filters" class="nav-item">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">全局筛选</span>
+        </a>
+        <a href="#core-metrics" class="nav-item">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-label">核心指标</span>
+        </a>
+        <a href="#metric-trends" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">指标趋势</span>
+        </a>
+        <a href="#gap-analysis" class="nav-item">
+          <span class="nav-icon"> 📈 </span>
+          <span class="nav-label">GAP归因分析</span>
+        </a>
+        <a href="#distribution-trends" class="nav-item">
+          <span class="nav-icon"> 🏨 </span>
+          <span class="nav-label">指标分布趋势</span>
+        </a>
+      </div>
+      
+      <button class="mobile-toggle" id="mobileToggle">
+        <span class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+    </div>
+    
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-nav-content">
+        <a href="#global-filters" class="mobile-nav-item"><span class="nav-icon">🔍</span><span class="nav-label">全局筛选</span></a>
+        <a href="#core-metrics" class="mobile-nav-item"><span class="nav-icon">🎯</span><span class="nav-label">核心指标</span></a>
+        <a href="#metric-trends" class="mobile-nav-item"><span class="nav-icon">📊</span><span class="nav-label">指标趋势</span></a>
+        <a href="#gap-analysis" class="mobile-nav-item"><span class="nav-icon">waterfall_chart</span><span class="nav-label">GAP归因分析</span></a>
+        <a href="#distribution-trends" class="mobile-nav-item"><span class="nav-icon">bar_chart</span><span class="nav-label">指标分布趋势</span></a>
+      </div>
+    </div>
+  </nav>
+    
+  <main class="container">
+    <section class="card" id="global-filters">
+      <div class="card-title">全局筛选</div>
+      <form id="filters" class="filters-grid">
+        <div class="filter-item">
+          <label>开始日期</label>
+          <input type="date" id="startDate" required>
+        </div>
+        <div class="filter-item">
+          <label>结束日期</label>
+          <input type="date" id="endDate" required>
+        </div>
+        <div class="filter-item">
+          <label>统计口径</label>
+          <select id="statCaliber" class="js-multi">
+            <option value="">全部</option>
+            <option value="reserve">预定</option>
+            <option value="checkout">离店</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>星级</label>
+          <select id="starLevel" class="js-multi">
+            <option value="">全部</option>
+            <option value="5">五星</option>
+            <option value="4">四星</option>
+            <option value="3">三星</option>
+            <option value="2">二星及以下</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>ADR</label>
+          <select id="adr" class="js-multi">
+            <option value="">全部</option>
+            <option value="0-200">[0,200)</option>
+            <option value="200-400">[200,400)</option>
+            <option value="400-600">[400,600)</option>
+            <option value="600+">[600,+∞)</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>挂牌等级</label>
+          <select id="boardLevel" class="js-multi">
+            <option value="">全部</option>
+            <option>无牌</option>
+            <option>特牌</option>
+            <option>蓝牌</option>
+            <option>金牌</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>是否早订</label>
+          <select id="earlyBook" class="js-multi">
+            <option value="">全部</option>
+            <option>是</option>
+            <option>否</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>是否连住</label>
+          <select id="multiNight" class="js-multi">
+            <option value="">全部</option>
+            <option>是</option>
+            <option>否</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>新老客</label>
+          <select id="newOld" class="js-multi">
+            <option value="">全部</option>
+            <option>新客</option>
+            <option>老客</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>C365用户</label>
+          <select id="c365" class="js-multi">
+            <option value="">全部</option>
+            <option>是</option>
+            <option>否</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>城市线级</label>
+          <select id="cityTier" class="js-multi">
+            <option value="">全部</option>
+            <option>新一线</option>
+            <option>一线</option>
+            <option>二线</option>
+            <option>三线</option>
+            <option>四线及以下</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>平台主张</label>
+          <select id="platformClaim" class="js-multi">
+            <option value="">全部</option>
+            <option>ROI阈值下间夜最大化</option>
+            <option>长期收益最大化</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>酒店类型</label>
+          <select id="hotelType" class="js-multi">
+            <option value="">全部</option>
+            <option>单体酒店</option>
+            <option>民宿</option>
+            <option>特色住宿</option>
+            <option>集团酒店</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>流量规模</label>
+          <select id="trafficScale" class="js-multi">
+            <option value="">全部</option>
+            <option>低</option>
+            <option>中低</option>
+            <option>中高</option>
+            <option>高</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label>酒店规模</label>
+          <select id="hotelScale" class="js-multi">
+            <option value="">全部</option>
+            <option>1-30</option>
+            <option>31-70</option>
+            <option>71-120</option>
+            <option>121+</option>
+          </select>
+        </div>
+        <div class="filter-item col-2">
+          <label>省份</label>
+          <div class="text-filter">
+            <select id="provinceOp">
+              <option value="==">==</option>
+              <option value="in">in</option>
+              <option value="contains">包含</option>
+              <option value="not_contains">不包含</option>
+            </select>
+            <input id="provinceInput" type="text" placeholder="多值用分号分隔">
+          </div>
+          <input type="hidden" id="province" value="">
+        </div>
+        <div class="filter-item col-2">
+          <label>城市</label>
+          <div class="text-filter">
+            <select id="cityOp">
+              <option value="==">==</option>
+              <option value="in">in</option>
+              <option value="contains">包含</option>
+              <option value="not_contains">不包含</option>
+            </select>
+            <input id="cityInput" type="text" placeholder="多值用分号分隔">
+          </div>
+          <input type="hidden" id="city" value="">
+        </div>
+        <div class="filter-item col-2">
+          <label>商圈</label>
+          <div class="text-filter">
+            <select id="bizOp">
+              <option value="==">==</option>
+              <option value="in">in</option>
+              <option value="contains">包含</option>
+              <option value="not_contains">不包含</option>
+            </select>
+            <input id="bizInput" type="text" placeholder="多值用分号分隔">
+          </div>
+          <input type="hidden" id="biz" value="">
+        </div>
+        <div class="filter-actions col-2">
+          <button type="button" id="resetBtn">重置</button>
+          <button type="submit" id="applyBtn">应用筛选</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" id="global-grouping">
+      <div class="module-title">全局分组</div>
+      <div class="filters-grid">
+        <div class="filter-item">
+          <label for="groupBy">分组维度</label>
+          <select id="groupBy">
+            <option value="">整体（默认）</option>
+            <optgroup label="可选项">
+                <option value="starType">星级类型</option>
+                <option value="adr">ADR</option>
+                <option value="boardLevel">挂牌等级</option>
+                <option value="earlyBook">是否早订</option>
+                <option value="multiNight">是否连住</option>
+                <option value="newOld">新老客</option>
+                <option value="c365">C365用户</option>
+                <option value="cityTier">城市线级</option>
+                <option value="platformClaim">平台主张</option>
+                <option value="hotelType">酒店类型</option>
+                <option value="trafficScale">流量规模</option>
+                <option value="hotelScale">酒店规模</option>
+            </optgroup>
+            <optgroup label="手动输入">
+                <option value="province">省份</option>
+                <option value="city">城市</option>
+                <option value="biz">商圈</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="filter-item" id="groupCustomWrapper" style="display:none">
+          <label id="groupCustomLabel">省份（分号分隔，最多10个）</label>
+          <div class="text-filter">
+            <input type="text" id="groupCustomInput" placeholder="示例：上海;北京;江苏">
+            <button type="button" id="groupApplyBtn" class="primary">确认</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="core-metrics">
+        <div class="module-header">
+            <div class="module-title">核心指标</div>
+            <div class="module-actions">
+                <button class="action-btn download-btn" id="downloadCoreMetrics">
+                    <span class="btn-icon">📥</span>
+                    <span class="btn-text">下载</span>
+                </button>
+                <button class="action-btn more-btn" id="moreCoreMetrics">
+                    <span class="btn-icon">⋯</span>
+                    <span class="btn-text">更多</span>
+                </button>
+            </div>
+        </div>
+        <div class="core-metrics-grid" id="coreMetricsGrid">
+        </div>
+    </section>
+
+    <section class="card" id="metric-trends">
+        <div class="module-header">
+            <div class="module-title">指标趋势</div>
+            <div class="module-actions">
+                <button class="action-btn download-btn" id="downloadMetricTrends">
+                    <span class="btn-icon">📥</span>
+                    <span class="btn-text">下载</span>
+                </button>
+                <button class="action-btn more-btn" id="moreMetricTrends">
+                    <span class="btn-icon">⋯</span>
+                    <span class="btn-text">更多</span>
+                </button>
+            </div>
+        </div>
+        <div class="metric-trends-grid" id="metricTrendsGrid">
+            <div class="subcard"><div class="subcard-title">间夜QC趋势</div><div id="chartNightQCTrend" class="chart"></div></div>
+            <div class="subcard"><div class="subcard-title">收益QC趋势</div><div id="chartRevenueQCTrend" class="chart"></div></div>
+            <div class="subcard"><div class="subcard-title">流量QC趋势</div><div id="chartTrafficQCTrend" class="chart"></div></div>
+            <div class="subcard"><div class="subcard-title">转化QC趋势</div><div id="chartConversionQCTrend" class="chart"></div></div>
+            <div class="subcard"><div class="subcard-title">佣金率GAP趋势</div><div id="chartCommissionGapTrend" class="chart"></div></div>
+            <div class="subcard"><div class="subcard-title">底价优势率趋势</div><div id="chartPriceAdvantageTrend" class="chart"></div></div>
+        </div>
+        <div class="metric-trends-grid expanded" id="metricTrendsExpanded" style="display: none;">
+            <!-- 额外的6个图表将在这里动态添加 -->
+        </div>
+    </section>
+    
+    <section class="card" id="gap-analysis">
+        <div class="module-title">GAP归因分析</div>
+        <div class="gap-analysis-grid">
+            <div class="subcard"><div class="subcard-title">Q</div><div id="chartGapQ" class="chart"></div></div>
+            <div class="subcard"><div class="subcard-title">C</div><div id="chartGapC" class="chart"></div></div>
+            <div class="subcard"><div class="subcard-title">Q vs C</div><div id="chartGapQvsC" class="chart"></div></div>
+        </div>
+    </section>
+
+    <section class="card" id="distribution-trends">
+        <div class="module-title">指标分布趋势</div>
+        <div class="subcard">
+            <div class="dist-tabs">
+                <button class="dist-tab-btn active" data-type="traffic">流量分布</button>
+                <button class="dist-tab-btn" data-type="nights">间夜分布</button>
+                <button class="dist-tab-btn" data-type="revenue">收益分布</button>
+            </div>
+            <div id="chartDistribution" class="chart" style="height:450px;"></div>
+        </div>
+    </section>
+
+  </main>
+  <script src="revenue-management-app.js"></script>
+</body>
+</html>
