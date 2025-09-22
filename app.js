@@ -2024,31 +2024,42 @@ function generateHotEventsData() {
   return events;
 }
 
-// 初始化日历
+// 1. 数据更新：generateHotEventsData 函数
+function generateHotEventsData() {
+    const events = [
+        // 为 2025/09/11 集中创建多个事件以测试排序和折叠
+        { name: '中秋节全国交通管制', date: '2025-09-11', endDate: '2025-09-13', type: 'festival', level: 'P0', impact: { hotels: 350, roomNight: 0.012, revenue: 0.008 } },
+        { name: 'CBA总决赛-G7', date: '2025-09-11', endDate: '2025-09-11', type: 'sports', level: 'P1', impact: { hotels: 152, roomNight: 0.005, revenue: 0.003 } },
+        { name: '张学友演唱会', date: '2025-09-11', endDate: '2025-09-11', type: 'concert', level: 'P2', impact: { hotels: 88, roomNight: 0.002, revenue: 0.001 } },
+        { name: '2025年注册会计师考试', date: '2025-09-11', endDate: '2025-09-13', type: 'exam', level: 'P2', impact: { hotels: 120, roomNight: 0.004, revenue: 0.002 } },
+        { name: '城市马拉松', date: '2025-09-11', endDate: '2025-09-11', type: 'sports', level: 'P3', impact: { hotels: 45, roomNight: 0.001, revenue: 0.0 } },
+
+        // 其他日期的事件
+        { name: '周杰伦演唱会', date: '2025-09-05', endDate: '2025-09-07', type: 'concert', level: 'P1', impact: { hotels: 106, roomNight: 0.001, revenue: 0.0 } },
+        { name: '2025年国家公务员考试', date: '2025-09-01', endDate: '2025-09-03', type: 'exam', level: 'P1', impact: { hotels: 210, roomNight: 0.009, revenue: 0.005 } },
+        { name: '林俊杰演唱会', date: '2025-10-08', endDate: '2025-10-10', type: 'concert', level: 'P1', impact: { hotels: 95, roomNight: 0.002, revenue: 0.001 } },
+        { name: 'NBA中国赛', date: '2025-10-12', endDate: '2025-10-14', type: 'sports', level: 'P0', impact: { hotels: 420, roomNight: 0.015, revenue: 0.011 } },
+        { name: '普通会展活动', date: '2025-09-18', endDate: '2025-09-20', type: 'normal', level: 'P3', impact: { hotels: 30, roomNight: 0.001, revenue: 0.0 } },
+    ];
+    return events;
+}
+
+// 2. 交互初始化：initHotEventsCalendar 函数
 function initHotEventsCalendar() {
-  const prevBtn = document.getElementById('prevMonth');
-  const nextBtn = document.getElementById('nextMonth');
-  const monthDisplay = document.getElementById('currentMonth');
-  
-  if (prevBtn) prevBtn.addEventListener('click', () => {
-    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+    const prevBtn = document.getElementById('prevMonth');
+    const nextBtn = document.getElementById('nextMonth');
+    
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        renderCalendar();
+    });
+    
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        renderCalendar();
+    });
+    
     renderCalendar();
-  });
-  
-  if (nextBtn) nextBtn.addEventListener('click', () => {
-    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-    renderCalendar();
-  });
-  
-  // 添加点击其他地方隐藏完整数据浮层的功能
-  document.addEventListener('click', (e) => {
-    const fullDataTooltip = document.getElementById('fullDataTooltip');
-    if (fullDataTooltip && !fullDataTooltip.contains(e.target) && !e.target.closest('.calendar-day')) {
-      hideFullDataTooltip();
-    }
-  });
-  
-  renderCalendar();
 }
 
 // 渲染日历
@@ -2631,4 +2642,199 @@ function fixTableHeaders(){
   });
 }
 
-window.addEventListener('DOMContentLoaded',()=>{setDefaultDates();setDefaultRegionRules();initCharts();enhanceAllMultis();attachEvents();fixTableHeaders()}) 
+// ADD new modal functions
+function showEventDetailsModal(dateStr, dayEvents) {
+    const modal = document.getElementById('eventModal');
+    const overlay = document.getElementById('eventModalOverlay');
+    const titleEl = document.getElementById('modalTitle');
+    const contentEl = document.getElementById('modalContent');
+    if (!modal || !overlay || !titleEl || !contentEl) return;
+
+    const date = new Date(dateStr);
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    titleEl.textContent = `${date.getMonth() + 1}月${date.getDate()}日 ${weekdays[date.getDay()]} - 热点事件`;
+    
+    contentEl.innerHTML = '';
+    const sortedEvents = [...dayEvents].sort((a, b) => (a.level === 'P1' ? -1 : 1));
+
+    sortedEvents.forEach(event => {
+        const typeIcons = {
+            exam: '📝', concert: '🎤', sports: '🏆', festival: '🎉', normal: '📌'
+        };
+        const eventHtml = `
+            <div class="modal-event-item">
+                <div class="event-icon ${event.type}">${typeIcons[event.type] || '📌'}</div>
+                <div class="event-info">
+                    <h4>${event.name}</h4>
+                    <p class="description">${event.description}</p>
+                    <div class="event-tags">
+                        ${event.level ? `<span class="tag ${event.level.toLowerCase()}">${event.level}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        contentEl.innerHTML += eventHtml;
+    });
+
+    modal.classList.add('show');
+    overlay.classList.add('show');
+}
+
+function hideEventDetailsModal() {
+    const modal = document.getElementById('eventModal');
+    const overlay = document.getElementById('eventModalOverlay');
+    if (modal) modal.classList.remove('show');
+    if (overlay) overlay.classList.remove('show');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    setDefaultDates();
+    setDefaultRegionRules();
+    initCharts();
+    enhanceAllMultis();
+    attachEvents();
+    fixTableHeaders();
+});
+
+// 新的日历相关函数
+// 3. 核心渲染逻辑：renderCalendar 函数
+function renderCalendar() {
+    const calendarGrid = document.getElementById('calendarGrid');
+    const monthDisplay = document.getElementById('currentMonth');
+    if (!calendarGrid || !monthDisplay) return;
+
+    const year = currentCalendarDate.getFullYear();
+    const month = currentCalendarDate.getMonth();
+    monthDisplay.textContent = `${year}年 ${month + 1}月`;
+    calendarGrid.innerHTML = '';
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const firstDayOfWeek = (firstDay.getDay() + 6) % 7;
+
+    const events = generateHotEventsData();
+    const totalDays = lastDay.getDate();
+    const totalCells = Math.ceil((firstDayOfWeek + totalDays) / 7) * 7;
+
+    for (let i = 0; i < totalCells; i++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'calendar-day';
+        const dayNumber = i - firstDayOfWeek + 1;
+
+        if (dayNumber < 1 || dayNumber > totalDays) {
+            dayDiv.classList.add('other-month');
+            const otherMonthDay = new Date(year, month, dayNumber).getDate();
+            dayDiv.innerHTML = `<div class="day-number">${otherMonthDay}</div>`;
+        } else {
+            const currentDate = new Date(year, month, dayNumber);
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+            if (currentDate.toDateString() === new Date().toDateString()) {
+                dayDiv.classList.add('today');
+            }
+
+            const dayEvents = events.filter(event => dateStr >= event.date && dateStr <= event.endDate);
+
+            dayDiv.innerHTML = `
+                <div class="day-number">${dayNumber}</div>
+                <div class="day-events">
+                    ${renderDayEvents(dayEvents)}
+                </div>
+            `;
+            
+            if (dayEvents.length > 0) {
+                dayDiv.addEventListener('mouseenter', (e) => showEventsPopover(e, dayEvents));
+                dayDiv.addEventListener('mouseleave', hideEventsPopover);
+            }
+        }
+        calendarGrid.appendChild(dayDiv);
+    }
+}
+
+// 4. 单元格内事件渲染：renderDayEvents 函数
+function renderDayEvents(dayEvents) {
+    if (dayEvents.length === 0) return '';
+    
+    const levelSortOrder = { 'P0': 0, 'P1': 1, 'P2': 2, 'P3': 3 };
+    const sortedEvents = [...dayEvents].sort((a, b) => levelSortOrder[a.level] - levelSortOrder[b.level]);
+    
+    const maxItemsToShow = 2;
+    let html = '';
+    const eventsToShow = sortedEvents.slice(0, maxItemsToShow);
+    const remainingCount = sortedEvents.length - maxItemsToShow;
+
+    eventsToShow.forEach(event => {
+        html += `
+            <div class="event-card level-${event.level.toLowerCase()}">
+                <div class="event-name">${event.name}</div>
+                <div class="event-details">入离: ${event.date.replaceAll('-', '/')} - ${event.endDate.replaceAll('-', '/')}</div>
+            </div>
+        `;
+    });
+
+    if (remainingCount > 0) {
+        html += `<div class="more-events">还有 ${remainingCount} 项</div>`;
+    }
+    
+    return html;
+}
+
+// 5. 悬浮窗显示逻辑：showEventsPopover 函数
+function showEventsPopover(e, dayEvents) {
+    const popover = document.getElementById('eventsPopover');
+    const targetDay = e.currentTarget;
+    if (!popover) return;
+    
+    const levelSortOrder = { 'P0': 0, 'P1': 1, 'P2': 2, 'P3': 3 };
+    const sortedEvents = [...dayEvents].sort((a, b) => levelSortOrder[a.level] - levelSortOrder[b.level]);
+
+    const date = new Date(targetDay.querySelector('.day-number').textContent.length > 2 ? currentCalendarDate : `${currentCalendarDate.getFullYear()}-${currentCalendarDate.getMonth() + 1}-${targetDay.querySelector('.day-number').textContent}`);
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    
+    let contentHtml = '';
+    sortedEvents.forEach(event => {
+        contentHtml += `
+            <div class="event-card level-${event.level.toLowerCase()}">
+                <div class="event-name">${event.name}</div>
+                <div class="event-details">入离: ${event.date.replaceAll('-', '/')} - ${event.endDate.replaceAll('-', '/')}</div>
+                <div class="event-impact">
+                    策略影响: ${event.impact.hotels}家酒店, 间夜占比${(event.impact.roomNight * 100).toFixed(3)}%, 收益占比${(event.impact.revenue * 100).toFixed(3)}%
+                </div>
+            </div>
+        `;
+    });
+    
+    popover.innerHTML = `
+        <div class="popover-header">${date.getMonth() + 1}月${date.getDate()}日 ${weekdays[date.getDay()]}</div>
+        <div class="popover-content">${contentHtml}</div>
+    `;
+
+    // --- 定位逻辑 ---
+    const calendar = document.querySelector('.hot-events-calendar');
+    const calendarRect = calendar.getBoundingClientRect();
+    const dayRect = targetDay.getBoundingClientRect();
+    
+    let top = dayRect.top - calendarRect.top + dayRect.height;
+    let left = dayRect.left - calendarRect.left;
+
+    // 防止悬浮窗超出日历底部
+    if (top + popover.offsetHeight > calendar.offsetHeight) {
+        top = dayRect.top - calendarRect.top - popover.offsetHeight - 10;
+    }
+    // 防止悬浮窗超出日历右侧
+    if (left + popover.offsetWidth > calendar.offsetWidth) {
+        left = dayRect.right - calendarRect.left - popover.offsetWidth;
+    }
+
+    popover.style.top = `${top}px`;
+    popover.style.left = `${left}px`;
+    
+    popover.classList.add('show');
+}
+
+// 6. 悬浮窗隐藏逻辑：hideEventsPopover 函数
+function hideEventsPopover() {
+    const popover = document.getElementById('eventsPopover');
+    if (popover) {
+        popover.classList.remove('show');
+    }
+}
