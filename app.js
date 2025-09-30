@@ -2378,20 +2378,62 @@ function getGroupsForDimension(dimension) {
 }
 
 function generateGroupedTargetData(groupBy, groups) {
-  // 横坐标使用全局分组维度的value值
-  const categories = groups;
+  // 定价目标的两个维度
+  const targetCategories = ['ROI阈值下间夜最大化', '长期收益最大化'];
+  
+  // 全局分组维度
+  const globalGroups = groups.length > 0 ? groups : ['五星', '四星', '三星', '二星', '一星'];
   const colors = ['#8ECFC9', '#FFBE7A', '#FA7F6F', '#82B0D2', '#BEB8DC', '#E7DAD2', '#999999'];
   
-  const series = [{
-    name: '定价目标',
-    type: 'bar',
-    data: groups.map(() => Math.round(Math.random() * 100 * 10) / 10),
-    itemStyle: {
-      color: '#8ECFC9'
-    }
-  }];
+  // 生成叉乘数据：每个定价目标下，每个全局分组都有一个值
+  const series = globalGroups.map((group, groupIndex) => {
+    const data = targetCategories.map((target, targetIndex) => {
+      // 为不同定价目标和分组生成不同的数据
+      // ROI阈值下间夜最大化通常值较低，长期收益最大化值较高
+      let baseValue;
+      if (targetIndex === 0) { // ROI阈值下间夜最大化
+        baseValue = 8 + Math.random() * 8; // 8-16%
+      } else { // 长期收益最大化
+        baseValue = 12 + Math.random() * 12; // 12-24%
+      }
+      
+      // 根据分组调整数值，五星酒店通常表现更好
+      if (group === '五星') {
+        baseValue *= 1.2;
+      } else if (group === '四星') {
+        baseValue *= 1.1;
+      } else if (group === '三星') {
+        baseValue *= 0.9;
+      } else if (group === '二星') {
+        baseValue *= 0.8;
+      } else if (group === '一星') {
+        baseValue *= 0.7;
+      }
+      
+      return Math.round(baseValue * 10) / 10;
+    });
+    
+    return {
+      name: group,
+      type: 'bar',
+      data: data,
+      itemStyle: {
+        color: colors[groupIndex % colors.length]
+      },
+      barMaxWidth: 28,
+      emphasis: {
+        focus: 'series'
+      },
+      label: {
+        show: false
+      }
+    };
+  });
   
-  return { categories, series };
+  return { 
+    categories: targetCategories, 
+    series: series 
+  };
 }
 
 function generateGroupedElasticData(groupBy, groups) {
@@ -2415,7 +2457,8 @@ function renderGroupCharts(groupBy, groups){
   // 如果没有分组或分组为空，使用星级作为默认分组
   if (!groupBy || !groups || groups.length === 0) {
     const defaultGroups = ['五星', '四星', '三星', '二星', '一星'];
-    chartTargetBar.setOption(makeSimpleBar(defaultGroups, [62.1, 36.4, 47.3, 28.9, 15.2], '#8ECFC9'), true);
+    const defaultTargetData = generateGroupedTargetData('', defaultGroups);
+    chartTargetBar.setOption(makeGroupedBarOption('定价目标', defaultTargetData), true);
     chartElasticBar.setOption(makeSimpleBar(defaultGroups, [4.7, 7.9, 9.9, 12.3, 15.6], '#FFBE7A'), true);
     chartQCBox.setOption(makeGroupedBoxplotOption('Q/C市占', defaultGroups), true);
     chartCEQMBox.setOption(makeGroupedBoxplotOption('CEQ/M市占', defaultGroups), true);
@@ -2426,7 +2469,7 @@ function renderGroupCharts(groupBy, groups){
   const targetData = generateGroupedTargetData(groupBy, groups);
   const elasticData = generateGroupedElasticData(groupBy, groups);
   
-  chartTargetBar.setOption(makeSimpleBar(targetData.categories, targetData.series[0].data, '#8ECFC9'), true);
+  chartTargetBar.setOption(makeGroupedBarOption('定价目标', targetData), true);
   chartElasticBar.setOption(makeSimpleBar(elasticData.categories, elasticData.series[0].data, '#FFBE7A'), true);
   chartQCBox.setOption(makeGroupedBoxplotOption('Q/C市占', groups), true);
   chartCEQMBox.setOption(makeGroupedBoxplotOption('CEQ/M市占', groups), true);
